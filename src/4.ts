@@ -1,102 +1,89 @@
-// const key = new Key();
-
-// const house = new MyHouse(key);
-// const person = new Person(key);
-
-// house.openDoor(person.getKey());
-
-// house.comeIn(person);
-
-
-// export {};
-
 // Key.ts
 
 export class Key {
-    private readonly signature: number;
-  
-    constructor() {
-      this.signature = Math.random();
-    }
-  
-    getSignature(): number {
-      return this.signature;
+  private readonly _signature: number;
+
+  constructor() {
+    this._signature = Math.random();
+  }
+
+  getSignature(): number {
+    return this._signature;
+  }
+}
+
+// Person.ts
+
+export class Person {
+  private readonly _name: string;
+  private readonly _key: Key;
+
+  constructor(name: string, key: Key) {
+    this._name = name;
+    this._key = key;
+  }
+
+  getName(): string {
+    return this._name;
+  }
+
+  getKey(): Key {
+    return this._key;
+  }
+}
+
+// House.ts
+
+export abstract class House {
+  protected _door: boolean;
+  protected readonly _key: Key;
+  protected readonly _tenants: Person[] = [];
+
+  constructor(door: boolean, key: Key) {
+    this._door = door;
+    this._key = key;
+  }
+
+  comeIn(person: Person): void {
+    if (this._door) {
+      this._tenants.push(person);
+      console.log(`${person.getName()} заходить в будинок.`);
+    } else {
+      console.log(`Двері закриті. ${person.getName()} не може зайти.`);
     }
   }
-  
-  // Person.ts
-  
-  export class Person {
-    private readonly name: string;
-    private readonly key: Key;
-  
-    constructor(name: string, key: Key) {
-      this.name = name;
-      this.key = key;
-    }
-  
-    getName(): string {
-      return this.name;
-    }
-  
-    getKey(): Key {
-      return this.key;
+
+  abstract openDoor(key: Key): void;
+}
+
+// MyHouse.ts
+
+export class MyHouse extends House {
+  constructor(key: Key) {
+    super(false, key);
+  }
+
+  openDoor(key: Key): void {
+    if (key.getSignature() === this._key.getSignature()) {
+      this._door = true;
+      console.log("Двері відчинені!");
+    } else {
+      console.log("Неправильний ключ!");
     }
   }
-  
-  // House.ts
-  
-  export abstract class House {
-    protected readonly door: boolean;
-    protected readonly key: Key;
-    protected readonly tenants: Person[] = [];
-  
-    constructor(door: boolean, key: Key) {
-      this.door = door;
-      this.key = key;
-    }
-  
-    comeIn(person: Person): void {
-      if (this.door) {
-        this.tenants.push(person);
-        console.log(`${person.getName()} enters the house.`);
-      } else {
-        console.log(`The door is closed. ${person.getName()} cannot enter.`);
-      }
-    }
-  
-    abstract openDoor(key: Key): void;
-  }
-  
-  // MyHouse.ts
-  
-  export class MyHouse extends House {
-    constructor(key: Key) {
-      super(false, key);
-    }
-  
-    openDoor(key: Key): void {
-      if (key.getSignature() === this.key.getSignature()) {
-        this.door = true;
-        console.log('The door is open!');
-      } else {
-        console.log('Wrong key!');
-      }
-    }
-  }
-  
-  // main.ts
-  
-  const myKey = new Key();
-  const myHouse = new MyHouse(myKey);
-  const johnDoe = new Person('John Doe', myKey);
-  
-  console.log('John Doe approaches the house.');
-  myHouse.openDoor(johnDoe.getKey()); // The door is open!
-  myHouse.comeIn(johnDoe); // John Doe enters the house.
-  
-  const janeDoe = new Person('Jane Doe', new Key());
-  console.log('Jane Doe approaches the house.');
-  myHouse.openDoor(janeDoe.getKey()); // Wrong key!
-  myHouse.comeIn(janeDoe); // The door is closed. Jane Doe cannot enter.
-  
+}
+
+// main.ts
+
+const myKey = new Key();
+const myHouse = new MyHouse(myKey);
+const johnDoe = new Person("Іван Довгань", myKey);
+const janeDoe = new Person("Іванна Довгань", new Key());
+
+console.log("Іван Довгань підходить до будинку.");
+myHouse.openDoor(johnDoe.getKey());
+myHouse.comeIn(johnDoe);
+
+console.log("Іванна Довгань підходить до будинку.");
+myHouse.openDoor(janeDoe.getKey());
+myHouse.comeIn(janeDoe);
